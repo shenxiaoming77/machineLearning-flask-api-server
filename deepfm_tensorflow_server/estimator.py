@@ -53,9 +53,9 @@ class DeepFMEstimator:
         else:
             logging.error("there is no model file in model checkpoint paht.....")
 
-    def predict(self, data_dic):
+    def predict(self, data_dict):
 
-        data_df = pd.DataFrame.from_dict(data_dic, orient='index').T
+        data_df = pd.DataFrame.from_dict(data_dict, orient='index').T
         actual_batch_size = len(data_df)
         batch_X = []
         batch_idx = []
