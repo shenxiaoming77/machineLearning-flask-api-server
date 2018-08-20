@@ -1,10 +1,6 @@
 #coding=utf-8
 
 import  ast
-import redis
-from  deepfm_tensorflow_server.kafkaClient import Kafka_Producer
-from  deepfm_tensorflow_server.settings import *
-from  deepfm_tensorflow_server.redisClient import RedisClient
 
 # redisClient = RedisClient()
 # redisClient.set('name', 'Michael')
