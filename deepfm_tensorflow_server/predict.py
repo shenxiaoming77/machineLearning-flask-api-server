@@ -15,9 +15,9 @@ curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
-from .settings import *
-from  .DeepFM import DeepFM
-from  .utilities import *
+from deepfm_tensorflow_server.settings import *
+from  deepfm_tensorflow_server.DeepFM import DeepFM
+from  deepfm_tensorflow_server.utilities import *
 
 '''
 tf.app.flags.DEFINE_xxx()就是添加命令行的optional argument（可选参数）
@@ -83,63 +83,63 @@ class DeepFMEstimator:
             if test_step % 50 == 0:
                 logging.info("Iteration {0} has finished".format(test_step))
 
-    def generate_data(self):
-        '''launching TensorBoard: tensorboard --logdir=path/to/log-directory'''
 
-    # seting fields
-    fields_test = ['hour', 'C1', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21',
+
+# seting fields
+fields_test = ['hour', 'C1', 'C14', 'C15', 'C16', 'C17', 'C18', 'C19', 'C20', 'C21',
                    'banner_pos', 'site_id' ,'site_domain', 'site_category', 'app_domain',
                    'app_id', 'device_id', 'app_category', 'device_model', 'device_type',
                    'device_conn_type']
-    # loading dicts
-    fields_test_dict = {}
-    for field in fields_test:
-        with open('dicts/'+field+'.pkl','rb') as f:
-            fields_test_dict[field] = pickle.load(f)
+# loading dicts
+fields_test_dict = {}
+for field in fields_test:
+    with open('dicts/'+field+'.pkl','rb') as f:
+        fields_test_dict[field] = pickle.load(f)
 
-    with open('dicts/' + 'click.pkl', 'rb') as f:
-        fields_test_dict['click'] = pickle.load(f)
+with open('dicts/' + 'click.pkl', 'rb') as f:
+    fields_test_dict['click'] = pickle.load(f)
 
-    # length of representation
-    feature_length = max(fields_test_dict['click'].values()) - 1
+# length of representation
+feature_length = max(fields_test_dict['click'].values()) - 1
 
-    fields_test_dict.pop('click')
+fields_test_dict.pop('click')
 
-    # initialize the model
-    config = {}
-    config['lr'] = 0.01
-    config['batch_size'] = 512
-    config['reg_l1'] = 2e-3
-    config['reg_l2'] = 0
-    config['k'] = 40
+# initialize the model
+config = {}
+config['lr'] = 0.01
+config['batch_size'] = 512
+config['reg_l1'] = 2e-3
+config['reg_l2'] = 0
+config['k'] = 40
 
-    # get feature length
-    config['feature_length'] = feature_length
-    test_array_length = feature_length
+# get feature length
+config['feature_length'] = feature_length
+test_array_length = feature_length
+print('feature length:' , config['feature_length'])
 
-    # num of fields
-    field_cnt = 21
-    config['field_cnt'] = field_cnt
+# num of fields
+field_cnt = 21
+config['field_cnt'] = field_cnt
 
-    model = DeepFM(config)
+model = DeepFM(config)
 
-    # build graph for model
-    model.build_graph()
+# build graph for model
+model.build_graph()
 
-    saver = tf.train.Saver(max_to_keep=5)
+saver = tf.train.Saver(max_to_keep=5)
 
+predictor = DeepFMEstimator()
 
+with tf.Session() as sess:
+    # TODO: with every epoches, print training accuracy and validation accuracy
+    #sess.run(tf.global_variables_initializer())
 
-    with tf.Session() as sess:
-        # TODO: with every epoches, print training accuracy and validation accuracy
-        #sess.run(tf.global_variables_initializer())
+    # restore trained parameters
+    print('restore trained model parameters.....')
+    predictor.check_restore_parameters(sess, saver)
 
-        # restore trained parameters
-        print('restore trained model parameters.....')
-        check_restore_parameters(sess, saver)
-
-        print('start perdict...')
-        batch_predict(sess, model)
+    print('start perdict...')
+    predictor.batch_predict(sess, model)
 
 
 

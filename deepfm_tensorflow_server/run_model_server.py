@@ -1,8 +1,8 @@
 #coding=utf-8
 import  redis
-from .estimator import DeepFMEstimator
+from deepfm_tensorflow_server.estimator import DeepFMEstimator
 import  numpy as np
-from  .settings import  *
+from  deepfm_tensorflow_server.settings import  *
 import  ast
 import  pandas as pd
 import  time
@@ -11,6 +11,8 @@ import  json
 redis_db = redis.StrictRedis(host = REDIS_HOST,
                              port = REDIS_PORT,
                              db = REDIS_DB)
+
+
 
 def _init_config():
     config = {}
@@ -21,7 +23,7 @@ def _init_config():
     config['k'] = 40
 
     # get feature length
-    config['feature_length'] = 2330
+    config['feature_length'] = 9041
 
     # num of fields
     field_cnt = 21
@@ -50,7 +52,7 @@ def start_run_server(config):
             for message_dict in message_list:
                 id = message_dict['id']
                 data_dict = message_dict['data']
-                prob = estimator.predict(data_dict)
+                prob = estimator.predict(data_dict)[0]
                 print('id:', id, '  prob:', prob)
                 redis_db.set(id, prob)
                 ids.append(id)
@@ -67,4 +69,4 @@ if __name__ == '__main__':
     config = _init_config()
 
     print('start to run web server')
-    start_run_server()
+    start_run_server(config)

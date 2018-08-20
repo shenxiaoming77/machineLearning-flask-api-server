@@ -10,12 +10,14 @@ import  random
 import  redis
 import  json
 import  time
+from deepfm_tensorflow_server.myencoder import MyEncoder
 
 from deepfm_tensorflow_server.settings import *
 
 
 #initialize the flask application and redis server
 app = flask.Flask(__name__)
+app.json_encoder = MyEncoder
 
 redis_db = redis.StrictRedis(host = REDIS_HOST,
                              port = REDIS_PORT,
@@ -24,7 +26,7 @@ redis_db = redis.StrictRedis(host = REDIS_HOST,
 
 
 
-@app.route("/predict", methods = ["POST"])
+@app.route("/api/predict", methods = ["POST"])
 def predict():
     result = {}
 
@@ -47,4 +49,4 @@ def predict():
 
 if __name__ == '__main__':
 
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="127.0.0.1", port=5000, debug=True)

@@ -22,6 +22,8 @@ class DeepFMEstimator:
 
     def __init__(self, config):
 
+        self.config = config
+
         self.model = DeepFM(config)
         # build graph for model
         self.model.build_graph()
